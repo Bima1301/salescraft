@@ -23,12 +23,12 @@ export default function BlogPage() {
                     </Link>
                 </div>
                 {isLoading ? (
-                    <p className="text-muted-foreground">Memuat blog...</p>
+                    <p className="text-muted-foreground">Loading blogs...</p>
                 ) : isError ? (
-                    <p className="text-red-500">Gagal memuat blog: {error?.message}</p>
+                    <p className="text-red-500">Failed to load blogs: {error?.message}</p>
                 ) : blogs.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
-                        Tidak ada blog yang tersedia.
+                        There are no blogs available yet.
                     </p>
                 ) : (
                     <div className="flex flex-col gap-4">

@@ -18,7 +18,7 @@ It includes a minimal but complete auth + protected area flow, and a small CRUD 
 
 - **Authentication**
   - Email/password auth via Better Auth.
-  - API route: `app/api/auth/[...all]/route.ts`.
+  - API route: `src/app/api/auth/[...all]/route.ts`.
   - React client via `authClient` from `better-auth/react`.
 
 - **Route groups**
@@ -32,7 +32,7 @@ It includes a minimal but complete auth + protected area flow, and a small CRUD 
     - Redirect to `/login` when there is no session.
     - Show basic account information and a **Logout** button (Better Auth `signOut`).
 
-- **Posts CRUD example**
+- **Posts API + Dashboard CRUD**
   - Backend:
     - Elysia router in `src/app/(protected)/dashboard/post/_server/route.ts` mounted under `/api/posts`.
     - Uses Drizzle models from `src/db/schema.ts`.
@@ -43,15 +43,22 @@ It includes a minimal but complete auth + protected area flow, and a small CRUD 
       - `POST /api/posts` – create a post (requires auth).
       - `PATCH /api/posts/:id` – update a post owned by the current user.
       - `DELETE /api/posts/:id` – delete a post owned by the current user.
-  - Client:
+  - Client (dashboard `/dashboard/post`):
     - Eden treaty client in `src/lib/eden.ts` (`api.posts...`) for type-safe calls.
     - React Query hooks in `src/app/(protected)/dashboard/post/_server/index.ts`.
     - UI in `src/app/(protected)/dashboard/post/_components`:
       - `post-page.tsx` – page container (`PostsPageClient`).
       - `post-form.tsx` – shared form component using React Hook Form + Zod resolver + shadcn `Field` components.
-      - `create-dialog.tsx` – create dialog (handles its own `useMutation` for create).
-      - `edit-dialog.tsx` – edit dialog (handles its own `useMutation` for update).
+      - `create-dialog.tsx` – create dialog (includes its own `useMutation` for create).
+      - `edit-dialog.tsx` – edit dialog (includes its own `useMutation` for update).
     - Toast notifications via `sonner`, configured globally in `src/components/sonner-provider.tsx` and wired in `src/app/layout.tsx`.
+
+- **Blog listing**
+  - Public page at `src/app/(public)/blog/page.tsx` (`/blog`).
+  - Uses React Query and the same posts API to show all posts as “blogs”:
+    - Data loader: `src/app/(public)/blog/_server/index.ts` (`fetchBlogs`, which calls `api.posts.get()`).
+    - UI card component (per-post) in `src/app/(public)/blog/_components/blog-card.tsx`.
+  - Reuses the `Post` type from the dashboard posts module, so API, dashboard, and blog remain in sync.
 
 ---
 
