@@ -1,6 +1,6 @@
 import cors from "@elysiajs/cors";
 import { Elysia } from "elysia";
-import { postsRouter } from "@/server/routes/posts";
+import { postsRouter } from "@/app/(protected)/dashboard/post/_server/route";
 
 export const app = new Elysia({ prefix: "/api" })
     .use(
@@ -11,7 +11,7 @@ export const app = new Elysia({ prefix: "/api" })
                     : true,
             methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
             credentials: true,
-            allowedHeaders: ["Content-Type", "Authorization", 'Cookie'],
+            allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
             exposeHeaders: ["Set-Cookie"],
         }),
     )

@@ -1,7 +1,14 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto flex max-w-5xl flex-col gap-10 px-6 py-16 md:flex-row md:items-center">
@@ -10,36 +17,35 @@ export default function Home() {
             NextJS &amp; Elysia Starter
           </p>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
-            Starter kit simpel
+            A simple starter kit
             <br />
-            untuk bangun aplikasi modern.
+            for building modern apps.
           </h1>
           <p className="max-w-xl text-sm text-muted-foreground md:text-base">
-            Sudah terintegrasi dengan Better Auth, React Query, dan styling
-            ala shadcn. Tinggal fokus ke fitur tanpa ribet setup.
+            Comes with Better Auth, React Query, and shadcn-style UI out of the box so you can focus on features instead of setup.
           </p>
 
           <div className="flex flex-wrap gap-3">
             <Button asChild size="lg">
-              <Link href="/register">Mulai Daftar</Link>
+              <Link href="/register">Get started</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link href="/login">Sudah punya akun?</Link>
+              <Link href="/login">Already have an account?</Link>
             </Button>
           </div>
 
           <div className="mt-4 grid gap-3 text-xs text-muted-foreground sm:grid-cols-3 sm:text-sm">
             <div className="rounded-lg border bg-card/40 px-3 py-2">
-              <p className="font-medium text-foreground">Auth siap pakai</p>
-              <p>Login, register, dan proteksi route dengan Better Auth.</p>
+              <p className="font-medium text-foreground">Auth ready to use</p>
+              <p>Login, register, and route protection powered by Better Auth.</p>
             </div>
             <div className="rounded-lg border bg-card/40 px-3 py-2">
-              <p className="font-medium text-foreground">UI modern</p>
-              <p>Warna dan komponen bergaya shadcn yang clean.</p>
+              <p className="font-medium text-foreground">Modern UI</p>
+              <p>Clean shadcn-inspired colors and components.</p>
             </div>
             <div className="rounded-lg border bg-card/40 px-3 py-2">
-              <p className="font-medium text-foreground">Siap di-scale</p>
-              <p>Integrasi Elysia &amp; Drizzle untuk backend ringan.</p>
+              <p className="font-medium text-foreground">Ready to scale</p>
+              <p>Elysia &amp; Drizzle integration for a lightweight backend.</p>
             </div>
           </div>
         </section>
@@ -51,7 +57,7 @@ export default function Home() {
                 <p className="text-xs font-medium text-muted-foreground">
                   Preview
                 </p>
-                <p className="text-sm font-semibold">Dashboard singkat</p>
+                <p className="text-sm font-semibold">Dashboard</p>
               </div>
               <span className="rounded-full bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
                 Demo
@@ -60,9 +66,9 @@ export default function Home() {
 
             <div className="space-y-3 text-xs">
               <div className="flex items-center justify-between rounded-lg bg-muted px-3 py-2">
-                <span className="text-muted-foreground">Status sesi</span>
+                <span className="text-muted-foreground">Session status</span>
                 <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600">
-                  Aman
+                  Active
                 </span>
               </div>
               <div className="rounded-lg border bg-background px-3 py-2">
@@ -70,16 +76,20 @@ export default function Home() {
                   Tips
                 </p>
                 <p className="mt-1 text-[11px]">
-                  Edit halaman dashboard &amp; settings untuk menyesuaikan
-                  kebutuhan proyekmu.
+                  Edit the dashboard &amp; settings pages to match your project&apos;s needs.
                 </p>
               </div>
             </div>
 
-            <div className="mt-5 flex justify-end">
-              <Button asChild size="sm">
-                <Link href="/dashboard">Buka dashboard</Link>
+            <div className="mt-5 flex justify-end gap-3">
+              <Button asChild size="sm" variant="outline">
+                <Link href="/blog">Blog</Link>
               </Button>
+              {session?.user && (
+                <Button asChild size="sm">
+                  <Link href="/dashboard">Open dashboard</Link>
+                </Button>
+              )}
             </div>
           </div>
         </aside>

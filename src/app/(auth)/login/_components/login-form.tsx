@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import Link from "next/link";
 
 export function LoginForm() {
   const router = useRouter();
@@ -24,7 +25,7 @@ export function LoginForm() {
     });
 
     if (error) {
-      setError(error.message ?? "Login gagal, periksa data Anda.");
+      setError(error.message ?? "Login failed, please check your credentials.");
       setIsSubmitting(false);
       return;
     }
@@ -35,11 +36,16 @@ export function LoginForm() {
   return (
     <div className="w-full max-w-md">
       <div className="rounded-xl border bg-card text-card-foreground shadow-md">
-        <div className="border-b px-6 py-4">
-          <h1 className="text-xl font-semibold tracking-tight">Masuk</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Gunakan email dan password yang sudah terdaftar.
-          </p>
+        <div className="flex items-center justify-between gap-4 px-6 py-4 border-b">
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight">Sign in</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Use your registered email and password.
+            </p>
+          </div>
+          <Link href="/" className={buttonVariants({ variant: 'secondary' })}>
+            Home
+          </Link>
         </div>
         <form onSubmit={onSubmit} className="space-y-4 px-6 py-6">
           <div className="space-y-1.5">
@@ -91,8 +97,9 @@ export function LoginForm() {
             className="w-full"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Memproses..." : "Masuk"}
+            {isSubmitting ? "Processing..." : "Sign in"}
           </Button>
+          <p className="text-sm text-muted-foreground">Don't have an account? <Link href="/register">Sign up</Link></p>
         </form>
       </div>
     </div>

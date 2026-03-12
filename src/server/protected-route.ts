@@ -7,23 +7,25 @@ export const protectedRoute = (app: Elysia) =>
             headers: request.headers,
         });
 
-        if (!session) {
-            return status(401);
-        }
+        if (!session) return status(401);
 
-        return status(200, { session });
+        return { session };
     });
 
-export const betterAuth = new Elysia({ name: "better-auth" }).mount(auth.handler).macro({
-    auth: {
-        async resolve({ status, request: { headers } }) {
-            const session = await auth.api.getSession({ headers });
+export const betterAuth = new Elysia({ name: "better-auth" })
+    .mount(auth.handler)
+    .macro({
+        auth: {
+            async resolve({ status, request: { headers } }) {
+                const session = await auth.api.getSession({
+                    headers,
+                });
 
-            if (!session) {
-                return status(401);
-            }
+                if (!session) return status(401);
 
-            return status(200, { session });
-        }
-    }
-});
+                return {
+                    session,
+                };
+            },
+        },
+    });

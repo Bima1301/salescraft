@@ -1,9 +1,8 @@
 import { treaty } from "@elysiajs/eden";
-import { app } from "@/app/api/[[...slugs]]/route";
+import type { app } from "@/app/api/[[...slugs]]/route";
 
-// .api to enter /api prefix
-export const api =
-    // process is defined on server side and build time
-    typeof process !== "undefined"
-        ? treaty(app).api
-        : treaty<typeof app>("localhost:3000").api;
+// Client-safe Eden instance: always talks to HTTP URL,
+// and only uses `app` as a TYPE (no server code in browser bundle).
+export const api = treaty<typeof app>(
+    process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000",
+).api;
