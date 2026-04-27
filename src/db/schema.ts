@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, index, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 
 export const user = pgTable("user", {
@@ -78,6 +78,7 @@ export const userRelations = relations(user, ({ many }) => ({
     sessions: many(session),
     accounts: many(account),
     posts: many(posts),
+    salesPages: many(salesPages),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -112,4 +113,38 @@ export const postRelations = relations(posts, ({ one }) => ({
         fields: [posts.userId],
         references: [user.id],
     }),
+}));
+
+export const salesPages = pgTable(
+    "sales_pages",
+    {
+        id: text("id")
+            .primaryKey()
+            .$defaultFn(() => nanoid()),
+        userId: text("user_id")
+            .references(() => user.id, { onDelete: "cascade" })
+            .notNull(),
+        productName: text("product_name").notNull(),
+        productDescription: text("product_description").notNull(),
+        features: text("features").array().notNull().default([]),
+        targetAudience: text("target_audience").notNull(),
+        price: text("price").notNull(),
+        uniqueSellingPoints: text("unique_selling_points").array().notNull().default([]),
+        template: text("template").notNull().default("modern"),
+        generatedContent: jsonb("generated_content"),
+        createdAt: timestamp("created_at").defaultNow().notNull(),
+        updatedAt: timestamp("updated_at").defaultNow().notNull(),
+    },
+    (table) => [index("sales_pages_userId_idx").on(table.userId)],
+);
+
+export const salesPagesRelations = relations(salesPages, ({ one }) => ({
+    user: one(user, {
+        fields: [salesPages.userId],
+        references: [user.id],
+    }),
+}));
+
+export const userSalesPagesRelations = relations(user, ({ many }) => ({
+    salesPages: many(salesPages),
 }));

@@ -1,6 +1,7 @@
 import cors from "@elysiajs/cors";
 import { Elysia } from "elysia";
 import { postsRouter } from "@/app/(protected)/dashboard/post/_server/route";
+import { salesPagesRouter } from "@/app/(protected)/dashboard/sales-pages/_server/route";
 
 export const app = new Elysia({ prefix: "/api" })
     .use(
@@ -15,7 +16,8 @@ export const app = new Elysia({ prefix: "/api" })
             exposeHeaders: ["Set-Cookie"],
         }),
     )
-    .use(postsRouter);
+    .use(postsRouter)
+    .use(salesPagesRouter);
 export const GET = app.fetch;
 export const POST = app.fetch;
 export const PUT = app.fetch;
