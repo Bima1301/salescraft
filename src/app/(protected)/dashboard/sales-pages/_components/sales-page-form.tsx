@@ -32,19 +32,25 @@ const templates = [
     id: "modern",
     label: "Modern",
     description: "Clean & minimal",
-    gradient: "from-violet-500 to-indigo-500",
+    gradient: "from-[#2563eb] to-[#60a5fa]",
+    selected: "border-[#2563eb]/40 bg-[#2563eb]/5 ring-2 ring-[#2563eb]/15",
+    dot: "bg-[#2563eb]",
   },
   {
     id: "bold",
     label: "Bold",
     description: "High impact",
-    gradient: "from-orange-500 to-red-500",
+    gradient: "from-[#f97316] to-[#ef4444]",
+    selected: "border-[#f97316]/45 bg-[#f97316]/5 ring-2 ring-[#f97316]/15",
+    dot: "bg-[#ef4444]",
   },
   {
     id: "elegant",
     label: "Elegant",
     description: "Sophisticated",
-    gradient: "from-emerald-500 to-teal-500",
+    gradient: "from-[#10b981] to-[#14b8a6]",
+    selected: "border-[#10b981]/45 bg-[#10b981]/5 ring-2 ring-[#10b981]/15",
+    dot: "bg-[#14b8a6]",
   },
 ] as const;
 
@@ -332,30 +338,38 @@ export function SalesPageForm({
           <h3 className="font-semibold">Design Template</h3>
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {templates.map((t) => (
             <button
               key={t.id}
               type="button"
               onClick={() => setValue("template", t.id)}
               className={cn(
-                "relative rounded-md border border-border p-4 text-left transition-all",
+                "relative rounded-lg border border-border p-5 text-left transition-all",
+                "hover:shadow-sm",
                 selectedTemplate === t.id
-                  ? "border-primary bg-primary/5 ring-2 ring-primary/20"
-                  : "border-border hover:border-primary/50",
+                  ? t.selected
+                  : "border-border hover:border-[#1F2B35]/15",
               )}
             >
               <div
                 className={cn(
-                  "mb-2 h-1.5 w-full rounded-full bg-gradient-to-r",
+                  "mb-3 h-2 w-full rounded-full bg-gradient-to-r relative",
                   t.gradient,
                 )}
               />
-              <p className="text-sm font-medium">{t.label}</p>
-              <p className="text-xs text-muted-foreground">{t.description}</p>
               {selectedTemplate === t.id && (
-                <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary" />
+                <div
+                  className={cn(
+                    "absolute left-[calc(100%-18px)] top-[26px] h-2.5 w-2.5 rounded-full shadow-sm",
+                    t.dot,
+                  )}
+                  aria-hidden="true"
+                />
               )}
+
+              <p className="text-sm font-semibold text-[#1F2B35]">{t.label}</p>
+              <p className="text-xs text-muted-foreground">{t.description}</p>
             </button>
           ))}
         </div>

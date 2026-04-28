@@ -24,28 +24,29 @@ interface SalesPageCardProps {
 }
 
 const templateColors: Record<string, string> = {
-  modern: "text-violet-500 bg-violet-500/10",
-  bold: "text-orange-500 bg-orange-500/10",
-  elegant: "text-emerald-500 bg-emerald-500/10",
+  modern: "text-[#0081F6] bg-[#0081F6]/10",
+  bold: "text-[#FF4D79] bg-[#FF4D79]/10",
+  elegant: "text-emerald-600 bg-[#5FFAD0]/20",
 };
 
 export function SalesPageCard({ page }: SalesPageCardProps) {
   const deleteMutation = useDeleteSalesPage();
 
   return (
-    <div className="rounded-lg border border-border bg-card p-5 flex flex-col gap-4 hover:shadow-md transition-all duration-200 group">
+    <div className="rounded-sm bg-white card-shadow p-5 flex flex-col gap-4 hover:translate-y-[-2px] transition-transform duration-200 group">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <div
-            className={`flex h-10 w-10 items-center justify-center rounded-lg shrink-0 ${templateColors[page.template] ?? "text-[var(--color-primary-1)] bg-[var(--color-primary-1)]/10"}`}
+            className={`flex h-10 w-10 items-center justify-center rounded-sm shrink-0 ${templateColors[page.template] ?? "text-[#0081F6] bg-[#0081F6]/10"}`}
           >
             <FileText className="h-5 w-5" />
           </div>
           <div className="min-w-0">
-            <p className="font-semibold truncate group-hover:text-[var(--color-primary-1)] transition-colors">
+            <p className="font-semibold truncate text-[#1F2B35] group-hover:text-[#0081F6] transition-colors"
+              style={{ fontFamily: "var(--font-heading)" }}>
               {page.productName}
             </p>
-            <p className="text-xs text-muted-foreground mt-0.5 truncate">
+            <p className="text-xs text-[#6F8394] mt-0.5 truncate">
               For: {page.targetAudience}
             </p>
           </div>
@@ -55,7 +56,7 @@ export function SalesPageCard({ page }: SalesPageCardProps) {
         </Badge>
       </div>
 
-      <p className="text-sm text-muted-foreground line-clamp-2">
+      <p className="text-sm text-[#6F8394] line-clamp-2">
         {page.productDescription}
       </p>
 
@@ -63,20 +64,20 @@ export function SalesPageCard({ page }: SalesPageCardProps) {
         {page.features.slice(0, 3).map((f) => (
           <span
             key={f}
-            className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+            className="rounded-sm bg-[#F6F8FA] border border-[#E2E8ED] px-2 py-0.5 text-xs text-[#6F8394]"
           >
             {f}
           </span>
         ))}
         {page.features.length > 3 && (
-          <span className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+          <span className="rounded-sm bg-[#F6F8FA] border border-[#E2E8ED] px-2 py-0.5 text-xs text-[#6F8394]">
             +{page.features.length - 3} more
           </span>
         )}
       </div>
 
-      <div className="flex items-center justify-between pt-2 border-t border-border">
-        <span className="text-xs text-muted-foreground flex items-center gap-1">
+      <div className="flex items-center justify-between pt-2 border-t border-[#E2E8ED]">
+        <span className="text-xs text-[#6F8394] flex items-center gap-1">
           <Clock className="h-3 w-3" />
           {formatDistanceToNow(new Date(page.createdAt))}
         </span>
@@ -88,26 +89,24 @@ export function SalesPageCard({ page }: SalesPageCardProps) {
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                className="h-8 w-8 rounded-sm text-[#6F8394] hover:text-red-500 hover:bg-red-50"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="rounded-lg border border-border bg-card">
+            <AlertDialogContent className="rounded-sm bg-white card-shadow">
               <AlertDialogHeader>
-                <AlertDialogTitle>Delete sales page?</AlertDialogTitle>
-                <AlertDialogDescription>
+                <AlertDialogTitle className="text-[#1F2B35]">Delete sales page?</AlertDialogTitle>
+                <AlertDialogDescription className="text-[#6F8394]">
                   This will permanently delete &ldquo;{page.productName}&rdquo;
                   and all its generated content. This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel className="rounded-md">
-                  Cancel
-                </AlertDialogCancel>
+                <AlertDialogCancel className="rounded-sm">Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={() => deleteMutation.mutate(page.id)}
-                  className="rounded-md bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  className="rounded-sm bg-red-500 text-white hover:bg-red-600"
                 >
                   Delete
                 </AlertDialogAction>
@@ -119,7 +118,7 @@ export function SalesPageCard({ page }: SalesPageCardProps) {
             asChild
             size="sm"
             variant="outline"
-            className="rounded-md h-8 text-xs gap-1.5"
+            className="rounded-sm h-8 text-xs gap-1.5 border-[#E2E8ED] text-[#0081F6] hover:bg-[#0081F6]/5"
           >
             <Link href={`/dashboard/sales-pages/${page.id}`}>
               View

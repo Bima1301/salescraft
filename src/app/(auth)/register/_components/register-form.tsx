@@ -3,190 +3,160 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import {
-  Eye,
-  EyeOff,
-  UserPlus,
-  Mail,
-  Lock,
-  User,
-  Sparkles,
-} from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+
+const inputCls = cn(
+    "flex h-11 w-full rounded-sm border border-[#E2E8ED] bg-white pl-10 pr-4 text-sm text-[#1F2B35]",
+    "transition-colors placeholder:text-[#6F8394]",
+    "focus:outline-none focus:border-[#0081F6] focus:ring-2 focus:ring-[#0081F6]/20",
+);
 
 export function RegisterForm() {
-  const router = useRouter();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
+    async function onSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setError(null);
 
-    const { error } = await authClient.signUp.email({
-      email,
-      password,
-      name,
-      callbackURL: "/dashboard",
-    });
+        const { error } = await authClient.signUp.email({
+            email,
+            password,
+            name,
+            callbackURL: "/dashboard",
+        });
 
-    if (error) {
-      setError(error.message ?? "Registration failed. Please try again.");
-      setIsSubmitting(false);
-      return;
+        if (error) {
+            setError(error.message ?? "Registration failed. Please try again.");
+            setIsSubmitting(false);
+            return;
+        }
+
+        router.push("/dashboard");
     }
 
-    router.push("/dashboard");
-  }
-
-  return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="rounded-lg border border-border bg-card p-8">
-        <div className="text-center mb-8">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--color-primary-1)]">
-            <Sparkles className="h-6 w-6 text-white" />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            Create an account
-          </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Start generating sales pages for free
-          </p>
-        </div>
-
-        <form onSubmit={onSubmit} className="space-y-5">
-          <div className="space-y-2">
-            <label
-              htmlFor="name"
-              className="text-sm font-medium text-foreground"
-            >
-              Full name
-            </label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                id="name"
-                type="text"
-                required
-                autoComplete="name"
-                className={cn(
-                  "flex h-10 w-full rounded-md border border-border bg-background pl-10 pr-4 text-sm",
-                  "transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-                  "placeholder:text-muted-foreground",
-                )}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="John Doe"
-              />
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+        >
+            <div className="text-center mb-8">
+                <h1
+                    className="text-[28px] font-bold tracking-tight text-[#1F2B35]"
+                    style={{ fontFamily: "var(--font-heading)" }}
+                >
+                    Create an account
+                </h1>
+                <p className="mt-2 text-sm text-[#6F8394]">
+                    Start generating sales pages for free
+                </p>
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <label
-              htmlFor="email"
-              className="text-sm font-medium text-foreground"
-            >
-              Email
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                id="email"
-                type="email"
-                required
-                autoComplete="email"
-                className={cn(
-                  "flex h-10 w-full rounded-md border border-border bg-background pl-10 pr-4 text-sm",
-                  "transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-                  "placeholder:text-muted-foreground",
+            <form onSubmit={onSubmit} className="space-y-5">
+                <div className="space-y-1.5">
+                    <label htmlFor="name" className="text-sm font-semibold text-[#1F2B35]">
+                        Full name
+                    </label>
+                    <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6F8394]" />
+                        <input
+                            id="name"
+                            type="text"
+                            required
+                            autoComplete="name"
+                            className={inputCls}
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="John Doe"
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-1.5">
+                    <label htmlFor="email" className="text-sm font-semibold text-[#1F2B35]">
+                        Email
+                    </label>
+                    <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6F8394]" />
+                        <input
+                            id="email"
+                            type="email"
+                            required
+                            autoComplete="email"
+                            className={inputCls}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="you@example.com"
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-1.5">
+                    <label htmlFor="password" className="text-sm font-semibold text-[#1F2B35]">
+                        Password
+                    </label>
+                    <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6F8394]" />
+                        <input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            required
+                            minLength={6}
+                            autoComplete="new-password"
+                            className={cn(inputCls, "pr-10")}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="At least 6 characters"
+                        />
+                        <button
+                            type="button"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6F8394] hover:text-[#1F2B35] transition-colors"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                    </div>
+                </div>
+
+                {error && (
+                    <div className="rounded-sm border border-red-200 bg-red-50 px-4 py-3">
+                        <p className="text-sm text-red-600">{error}</p>
+                    </div>
                 )}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-              />
-            </div>
-          </div>
 
-          <div className="space-y-2">
-            <label
-              htmlFor="password"
-              className="text-sm font-medium text-foreground"
-            >
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                required
-                minLength={6}
-                autoComplete="new-password"
-                className={cn(
-                  "flex h-10 w-full rounded-md border border-border bg-background pl-10 pr-10 text-sm",
-                  "transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-                  "placeholder:text-muted-foreground",
-                )}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="At least 6 characters"
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
-                ) : (
-                  <Eye className="h-4 w-4" />
-                )}
-              </button>
-            </div>
-          </div>
+                <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full h-11 rounded-sm text-sm font-bold text-white gradient-secondary btn-shadow-pink disabled:opacity-60 transition-opacity hover:opacity-90"
+                    style={{ fontFamily: "var(--font-heading)" }}
+                >
+                    {isSubmitting ? (
+                        <span className="flex items-center justify-center gap-2">
+                            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                            Creating account...
+                        </span>
+                    ) : (
+                        "Create account"
+                    )}
+                </button>
+            </form>
 
-          {error && (
-            <div className="rounded-md bg-destructive/10 border border-destructive/20 px-4 py-3">
-              <p className="text-sm text-destructive">{error}</p>
-            </div>
-          )}
-
-          <Button
-            type="submit"
-            className="w-full h-10 bg-[var(--color-secondary-1)] text-white border-0 hover:bg-[var(--color-secondary-2)] font-semibold"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? (
-              <span className="flex items-center gap-2">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                Creating account...
-              </span>
-            ) : (
-              <span className="flex items-center gap-2">
-                <UserPlus className="h-4 w-4" />
-                Create account
-              </span>
-            )}
-          </Button>
-        </form>
-
-        <p className="mt-6 text-center text-sm text-muted-foreground">
-          Already have an account?{" "}
-          <Link
-            href="/login"
-            className="text-[var(--color-primary-1)] font-medium hover:underline underline-offset-4"
-          >
-            Sign in
-          </Link>
-        </p>
-      </div>
-    </div>
-  );
+            <p className="mt-6 text-center text-sm text-[#6F8394]">
+                Already have an account?{" "}
+                <Link href="/login" className="text-[#0081F6] font-semibold hover:underline underline-offset-4">
+                    Sign in
+                </Link>
+            </p>
+        </motion.div>
+    );
 }

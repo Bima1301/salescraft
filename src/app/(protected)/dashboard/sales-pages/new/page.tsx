@@ -20,35 +20,33 @@ export default function NewSalesPagePage() {
   }
 
   return (
-    <main className="flex-1 p-6 lg:p-8">
-      <div className="mx-auto max-w-2xl space-y-6">
-        <div className="flex items-center gap-3">
-          <Button asChild variant="ghost" size="icon" className="rounded-xl">
-            <Link href="/dashboard/sales-pages">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold tracking-tight">
-                Create Sales Page
-              </h1>
-              <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--color-secondary-1)]">
-                <Sparkles className="h-3 w-3 text-white" />
-              </div>
+    <div className="mx-auto max-w-6xl space-y-6 py-5 w-full">
+      <div className="flex items-center gap-3">
+        <Button asChild variant="ghost" size="icon" className="rounded-xl">
+          <Link href="/dashboard/sales-pages">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        </Button>
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold tracking-tight">
+              Create Sales Page
+            </h1>
+            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--color-secondary-1)]">
+              <Sparkles className="h-3 w-3 text-white" />
             </div>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Fill in your product details and AI will generate a full sales
-              page.
-            </p>
           </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Fill in your product details and AI will generate a full sales
+            page.
+          </p>
         </div>
-
-        <SalesPageForm
-          onSubmit={handleSubmit}
-          isLoading={createMutation.isPending}
-        />
       </div>
-    </main>
+
+      <SalesPageForm
+        onSubmit={handleSubmit}
+        isLoading={createMutation.isPending}
+      />
+    </div>
   );
 }

@@ -15,6 +15,11 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -32,6 +37,7 @@ import {
   Trash2,
   RefreshCw,
   Download,
+  ExternalLink,
   Sparkles,
   Loader2,
   Clock,
@@ -64,6 +70,7 @@ export function SalesPageDetail({ id }: SalesPageDetailProps) {
   const updateMutation = useUpdateSalesPage(id);
   const deleteMutation = useDeleteSalesPage();
   const regenerateMutation = useRegenerateSalesPage(id);
+  const [regenerateSection, setRegenerateSection] = useState<string>("all");
   const [regenerateOpen, setRegenerateOpen] = useState(false);
 
   async function handleUpdate(data: SalesPageBodyInput) {
@@ -156,46 +163,62 @@ export function SalesPageDetail({ id }: SalesPageDetailProps) {
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
-            {/* Regenerate dropdown */}
-            <div className="relative">
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-xl gap-1.5"
-                onClick={() => setRegenerateOpen(!regenerateOpen)}
-                disabled={regenerateMutation.isPending}
+            {/* Regenerate (shadcn Popover, Agnes-style dropdown) */}
+            <Popover open={regenerateOpen} onOpenChange={setRegenerateOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-xl gap-1.5"
+                  disabled={regenerateMutation.isPending}
+                >
+                  {regenerateMutation.isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-3.5 w-3.5" />
+                  )}
+                  Regenerate
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="end"
+                className="w-52 p-1.5 rounded-lg border border-border bg-card shadow-lg"
               >
-                {regenerateMutation.isPending ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <RefreshCw className="h-3.5 w-3.5" />
-                )}
-                Regenerate
-                <ChevronDown className="h-3 w-3" />
-              </Button>
-              {regenerateOpen && (
-                <div className="absolute right-0 top-full mt-1 z-50 w-44 rounded-lg border border-border bg-card shadow-lg overflow-hidden">
-                  {regenerateSections.map((s) => (
+                {regenerateSections.map((s) => {
+                  const selected = regenerateSection === s.id;
+                  return (
                     <button
                       key={s.id}
+                      type="button"
                       className={cn(
-                        "flex w-full items-center gap-2 px-4 py-2.5 text-sm hover:bg-muted transition-colors text-left",
-                        s.id === "all" && "font-medium text-primary",
+                        "flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-left transition-colors",
+                        "hover:bg-muted",
+                        selected && "bg-muted/70 font-medium",
+                        s.id === "all" && selected && "text-primary",
                       )}
                       onClick={async () => {
+                        setRegenerateSection(s.id);
                         setRegenerateOpen(false);
                         await regenerateMutation.mutateAsync(
                           s.id === "all" ? undefined : s.id,
                         );
                       }}
                     >
-                      {s.id === "all" && <Sparkles className="h-3.5 w-3.5" />}
-                      {s.label}
+                      {s.id === "all" ? (
+                        <Sparkles className="h-3.5 w-3.5" />
+                      ) : null}
+                      <span className="flex-1">{s.label}</span>
+                      {selected ? (
+                        <span className="text-xs text-muted-foreground">
+                          Selected
+                        </span>
+                      ) : null}
                     </button>
-                  ))}
-                </div>
-              )}
-            </div>
+                  );
+                })}
+              </PopoverContent>
+            </Popover>
 
             <Button
               variant="outline"
@@ -206,6 +229,23 @@ export function SalesPageDetail({ id }: SalesPageDetailProps) {
             >
               <Download className="h-3.5 w-3.5" />
               Export HTML
+            </Button>
+
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="rounded-xl gap-1.5"
+              disabled={!content}
+            >
+              <Link
+                href={`/sales-pages/${id}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                Full Preview
+              </Link>
             </Button>
 
             <AlertDialog>
@@ -314,13 +354,42 @@ function generateHtmlExport(
   content: GeneratedContent,
   template: string,
 ): string {
-  const themeColors = {
-    modern: { from: "#7c3aed", to: "#4f46e5", accent: "#8b5cf6" },
-    bold: { from: "#ea580c", to: "#dc2626", accent: "#f97316" },
-    elegant: { from: "#059669", to: "#0d9488", accent: "#10b981" },
+  const base = {
+    text1: "#1F2B35",
+    text2: "#6F8394",
+    bg1: "#FFFFFF",
+    bg2: "#F6F8FA",
+    bg3: "#E2E8ED",
+    footer: "#1F2B35",
+    accent: "#5FFAD0",
   };
-  const colors =
-    themeColors[template as keyof typeof themeColors] ?? themeColors.modern;
+
+  const paletteByTemplate: Record<
+    string,
+    { heroFrom: string; heroTo: string; ctaFrom: string; ctaTo: string }
+  > = {
+    modern: {
+      heroFrom: "#2563eb",
+      heroTo: "#60a5fa",
+      ctaFrom: "#2563eb",
+      ctaTo: "#60a5fa",
+    },
+    bold: {
+      heroFrom: "#f97316",
+      heroTo: "#ef4444",
+      ctaFrom: "#f97316",
+      ctaTo: "#ef4444",
+    },
+    elegant: {
+      heroFrom: "#10b981",
+      heroTo: "#14b8a6",
+      ctaFrom: "#10b981",
+      ctaTo: "#14b8a6",
+    },
+  };
+
+  const palette = paletteByTemplate[template] ?? paletteByTemplate.modern;
+  const colors = { ...base, ...palette };
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -328,57 +397,92 @@ function generateHtmlExport(
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${productName} — Sales Page</title>
+  <link href="https://fonts.googleapis.com/css?family=Hind+Vadodara:400,700|Mukta:500,700" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0f; color: #f5f5f5; line-height: 1.6; }
-    .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
-    /* Hero */
-    .hero { background: linear-gradient(135deg, #1e1b4b, #0f172a); padding: 80px 24px; text-align: center; }
-    .badge { display: inline-block; background: rgba(124,58,237,0.2); border: 1px solid rgba(124,58,237,0.4); color: #a78bfa; padding: 6px 16px; border-radius: 999px; font-size: 12px; margin-bottom: 24px; }
-    .hero h1 { font-size: 3rem; font-weight: 900; margin-bottom: 16px; }
-    .hero .sub { font-size: 1.25rem; color: ${colors.accent}; margin-bottom: 12px; font-weight: 600; }
-    .hero .desc { color: rgba(245,245,245,0.6); max-width: 520px; margin: 0 auto 32px; }
-    .btn { display: inline-block; background: linear-gradient(135deg, ${colors.from}, ${colors.to}); color: white; padding: 14px 36px; border-radius: 12px; font-weight: 700; font-size: 15px; text-decoration: none; border: none; cursor: pointer; }
-    .btn-ghost { display: inline-block; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white; padding: 14px 36px; border-radius: 12px; font-weight: 600; font-size: 15px; text-decoration: none; margin-left: 12px; }
-    .sub-cta { color: rgba(245,245,245,0.4); font-size: 12px; margin-top: 8px; }
+    body { font-family: "Hind Vadodara", system-ui, -apple-system, Segoe UI, sans-serif; background: ${colors.bg2}; color: ${colors.text2}; line-height: 1.6; }
+    h1,h2,h3 { font-family: "Mukta", system-ui, -apple-system, Segoe UI, sans-serif; color: ${colors.text1}; }
+    a { color: inherit; }
+    .boxed { max-width: 1440px; margin: 0 auto; background: ${colors.bg1}; box-shadow: 0 16px 48px ${colors.bg3}; overflow: hidden; min-height: 100vh; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    /* Hero (Agnes) */
+    .hero { position: relative; padding: 92px 24px 80px; }
+    .hero::before { content: ""; position: absolute; bottom: 0; right: 0; height: 520px; width: 100%; background: linear-gradient(to top right, ${colors.heroFrom} 0%, ${colors.heroTo} 100%); }
+    @media (min-width: 1025px) { .hero::before { width: 43%; } }
+    .hero-inner { position: relative; display: grid; gap: 40px; align-items: center; }
+    @media (min-width: 860px) { .hero-inner { grid-template-columns: 1.1fr 0.9fr; } }
+    .badge { display: inline-flex; align-items: center; gap: 8px; border: 1px solid ${colors.bg3}; background: ${colors.bg1}; color: ${colors.text2}; padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; margin-bottom: 16px; }
+    .hero h1 { font-size: 56px; line-height: 66px; letter-spacing: -0.1px; font-weight: 700; margin-bottom: 12px; }
+    @media (max-width: 640px) { .hero h1 { font-size: 42px; line-height: 52px; } }
+    .hero .sub { font-size: 18px; line-height: 27px; color: ${colors.text2}; margin-bottom: 18px; }
+    .hero .desc { font-size: 14px; color: ${colors.text2}; max-width: 560px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(65deg, ${colors.ctaFrom} 0%, ${colors.ctaTo} 100%); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 700; font-size: 15px; text-decoration: none; border: none; cursor: pointer; box-shadow: 0 8px 16px rgba(31,43,53,0.12); }
+    .btn:hover { opacity: 0.93; }
+    .btn-ghost { display: inline-flex; align-items: center; justify-content: center; border: 1px solid ${colors.bg3}; background: ${colors.bg1}; color: ${colors.heroFrom}; padding: 14px 28px; border-radius: 8px; font-weight: 700; font-size: 15px; text-decoration: none; }
+    .sub-cta { color: ${colors.text2}; font-size: 12px; margin-top: 10px; }
+    .hero-card { background: ${colors.bg1}; border: 1px solid ${colors.bg3}; box-shadow: 0 16px 48px ${colors.bg3}; border-radius: 8px; overflow: hidden; }
+    .hero-card-head { background: ${colors.bg2}; border-bottom: 1px solid ${colors.bg3}; padding: 14px 16px; font-size: 12px; font-weight: 700; color: ${colors.text2}; font-family: "Mukta", sans-serif; }
+    .hero-card-body { padding: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .mini { background: ${colors.bg2}; border: 1px solid ${colors.bg3}; border-radius: 6px; padding: 10px; }
+    .mini strong { display:block; font-size: 12px; color: ${colors.text1}; margin-bottom: 4px; }
+    .mini span { font-size: 12px; color: ${colors.text2}; }
     /* Sections */
     section { padding: 72px 24px; }
-    section.alt { background: rgba(255,255,255,0.02); }
-    section h2 { text-align: center; font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
-    section .subtitle { text-align: center; color: rgba(245,245,245,0.5); margin-bottom: 40px; }
+    section.alt { background: ${colors.bg2}; }
+    section h2 { text-align: center; font-size: 42px; line-height: 52px; letter-spacing: -0.1px; font-weight: 700; margin-bottom: 8px; }
+    @media (max-width: 640px) { section h2 { font-size: 36px; line-height: 46px; } }
+    section .subtitle { text-align: center; color: ${colors.text2}; margin-bottom: 40px; }
     /* Cards */
     .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
-    .card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 24px; }
-    .icon { width: 40px; height: 40px; background: linear-gradient(135deg, ${colors.from}, ${colors.to}); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 18px; }
-    .card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-    .card p { font-size: 13px; color: rgba(245,245,245,0.5); }
+    .card { background: ${colors.bg1}; border: 1px solid ${colors.bg3}; box-shadow: 0 16px 48px ${colors.bg3}; border-radius: 8px; padding: 24px; }
+    .icon { width: 40px; height: 40px; background: linear-gradient(65deg, ${colors.ctaFrom} 0%, ${colors.ctaTo} 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; font-size: 18px; color: white; }
+    .card h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: ${colors.text1}; font-family: "Mukta", sans-serif; }
+    .card p { font-size: 14px; color: ${colors.text2}; }
     /* Stars */
-    .stars { color: #facc15; margin-bottom: 10px; font-size: 13px; letter-spacing: 2px; }
+    .stars { color: ${colors.accent}; margin-bottom: 10px; font-size: 13px; letter-spacing: 2px; }
     /* Price */
-    .price-card { background: rgba(255,255,255,0.04); border: 2px solid ${colors.accent}33; border-radius: 20px; padding: 40px; text-align: center; max-width: 380px; margin: 0 auto; }
-    .price-num { font-size: 3.5rem; font-weight: 900; color: ${colors.accent}; }
-    .price-period { color: rgba(245,245,245,0.4); font-size: 13px; }
+    .price-card { background: ${colors.bg1}; border: 2px solid ${colors.heroFrom}22; border-radius: 12px; padding: 40px; text-align: center; max-width: 420px; margin: 0 auto; box-shadow: 0 16px 48px ${colors.bg3}; }
+    .price-num { font-size: 56px; font-weight: 900; color: ${colors.heroFrom}; font-family: "Mukta", sans-serif; }
+    .price-period { color: ${colors.text2}; font-size: 13px; }
     .features-list { list-style: none; margin: 24px 0; text-align: left; }
-    .features-list li { padding: 6px 0; font-size: 14px; color: rgba(245,245,245,0.7); }
+    .features-list li { padding: 6px 0; font-size: 14px; color: ${colors.text2}; }
     .features-list li::before { content: '✓  '; color: ${colors.accent}; font-weight: 700; }
     /* CTA */
-    .cta-section { background: linear-gradient(135deg, ${colors.from}22, ${colors.to}22); text-align: center; padding: 80px 24px; }
-    .avatar { width: 36px; height: 36px; background: linear-gradient(135deg, ${colors.from}, ${colors.to}); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 700; margin-right: 10px; vertical-align: middle; }
+    .cta-section { background: ${colors.footer}; text-align: center; padding: 80px 24px; color: white; }
+    .cta-section h2 { color: white; }
+    .avatar { width: 36px; height: 36px; background: linear-gradient(65deg, ${colors.ctaFrom}, ${colors.ctaTo}); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 700; margin-right: 10px; vertical-align: middle; }
+    /* Footer */
+    .footer { background: ${colors.footer}; padding: 40px 24px; color: ${colors.text2}; }
+    .footer-inner { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 24px; display: flex; gap: 16px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
   </style>
 </head>
 <body>
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container">
-      <span class="badge">✦ AI-Powered Sales Page</span>
-      <h1>${content.headline}</h1>
-      <p class="sub">${content.subHeadline}</p>
-      <p class="desc">${content.productDescription}</p>
-      <a href="#pricing" class="btn">${content.cta.text}</a>
-      <a href="#features" class="btn-ghost">Learn more</a>
-      <p class="sub-cta">${content.cta.subtext}</p>
-    </div>
-  </section>
+  <div class="boxed">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-inner">
+          <div>
+            <span class="badge">✦ AI Generated</span>
+            <h1>${content.headline}</h1>
+            <p class="sub">${content.subHeadline}</p>
+            <p class="desc">${content.productDescription}</p>
+            <div class="actions">
+              <a href="#pricing" class="btn">${content.cta.text} →</a>
+              <a href="#features" class="btn-ghost">Learn more</a>
+            </div>
+            <p class="sub-cta">${content.cta.subtext}</p>
+          </div>
+          <div class="hero-card">
+            <div class="hero-card-head">Preview</div>
+            <div class="hero-card-body">
+              ${content.benefits.slice(0,4).map((b) => `<div class="mini"><strong>${b.title}</strong><span>${b.description}</span></div>`).join("")}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
   <!-- Benefits -->
   <section>
@@ -409,16 +513,16 @@ function generateHtmlExport(
       <p class="subtitle">Don't just take our word for it.</p>
       <div class="grid-3">
         ${content.socialProof
-          .map(
-            (t) => `<div class="card">
+      .map(
+        (t) => `<div class="card">
           <div class="stars">★★★★★</div>
           <p style="font-size:13px;color:rgba(245,245,245,0.6);margin-bottom:16px;font-style:italic;">"${t.quote}"</p>
           <span class="avatar">${t.name.charAt(0)}</span>
           <strong style="font-size:13px;">${t.name}</strong>
           <span style="font-size:12px;color:rgba(245,245,245,0.4);"> · ${t.role}</span>
         </div>`,
-          )
-          .join("")}
+      )
+      .join("")}
       </div>
     </div>
   </section>
@@ -444,10 +548,23 @@ function generateHtmlExport(
   <section class="cta-section">
     <div class="container">
       <h2>Ready to get started with ${productName}?</h2>
-      <p style="color:${colors.accent};margin:12px 0 32px;font-size:1.1rem;">Join thousands of satisfied customers. Start today.</p>
+      <p style="color:${colors.text2};margin:12px 0 32px;font-size:1.05rem;">Join thousands of satisfied customers. Start today.</p>
       <a href="#" class="btn">${content.cta.text} →</a>
     </div>
   </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="display:inline-block;width:18px;height:18px;border-radius:999px;background:linear-gradient(65deg, ${colors.heroFrom}, ${colors.ctaFrom});"></span>
+          <strong style="font-family:Mukta,sans-serif;color:#fff;">${productName}</strong>
+        </div>
+        <div style="font-size:12px;">© ${new Date().getFullYear()} ${productName}. Generated with SalesCraft.</div>
+      </div>
+    </div>
+  </footer>
+  </div>
 </body>
 </html>`;
 }

@@ -76,6 +76,33 @@ Make the copy highly persuasive, professional, and tailored to the target audien
 export const salesPagesRouter = new Elysia({ prefix: "/sales-pages" })
     .use(betterAuth)
     .get(
+        "/public/:id",
+        async ({ params }) => {
+            const { id } = params;
+
+            const [page] = await db
+                .select({
+                    id: salesPages.id,
+                    productName: salesPages.productName,
+                    template: salesPages.template,
+                    generatedContent: salesPages.generatedContent,
+                    updatedAt: salesPages.updatedAt,
+                })
+                .from(salesPages)
+                .where(eq(salesPages.id, id));
+
+            if (!page) throw new Response("Sales page not found", { status: 404 });
+            if (!page.generatedContent)
+                throw new Response("Sales page has no generated content", { status: 404 });
+
+            return page;
+        },
+        {
+            auth: false,
+            params: z.object({ id: z.string() }),
+        },
+    )
+    .get(
         "/",
         async ({ session }) => {
             const { id: userId } = session.user;

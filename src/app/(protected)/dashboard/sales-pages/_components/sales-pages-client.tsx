@@ -24,7 +24,7 @@ export function SalesPagesClient() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-lg border border-border bg-card p-5 space-y-4"
+            className="rounded-sm bg-white card-shadow p-5 space-y-4"
           >
             <Skeleton className="h-5 w-3/4" />
             <Skeleton className="h-4 w-1/2" />
@@ -41,28 +41,26 @@ export function SalesPagesClient() {
 
   if (isError) {
     return (
-      <div className="rounded-lg border border-border bg-card p-10 text-center">
-        <p className="text-muted-foreground">
-          Failed to load sales pages. Please try again.
-        </p>
+      <div className="rounded-sm bg-white card-shadow p-10 text-center">
+        <p className="text-[#6F8394]">Failed to load sales pages. Please try again.</p>
       </div>
     );
   }
 
   if (!pages || pages.length === 0) {
     return (
-      <div className="rounded-lg border border-border bg-card p-14 text-center">
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-[var(--color-primary-1)]/20 bg-[var(--color-primary-1)]/5">
-          <Sparkles className="h-7 w-7 text-[var(--color-primary-1)]" />
+      <div className="rounded-sm bg-white card-shadow p-14 text-center">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-[#0081F6]/20 bg-[#0081F6]/5">
+          <Sparkles className="h-7 w-7 text-[#0081F6]" />
         </div>
-        <h3 className="text-lg font-semibold mb-2">No sales pages yet</h3>
-        <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
+        <h3 className="text-lg font-semibold mb-2 text-[#1F2B35]">No sales pages yet</h3>
+        <p className="text-sm text-[#6F8394] mb-6 max-w-sm mx-auto">
           Create your first AI-powered sales page. Enter your product details
           and let SalesCraft craft the perfect pitch.
         </p>
         <Button
           asChild
-          className="bg-[var(--color-secondary-1)] text-white border-0 hover:bg-[var(--color-secondary-2)]"
+          className="gradient-secondary text-white border-0 hover:opacity-90 btn-shadow-pink"
         >
           <Link href="/dashboard/sales-pages/new">
             <PlusCircle className="mr-2 h-4 w-4" />
@@ -80,13 +78,13 @@ export function SalesPagesClient() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search by product name or audience..."
-        className="flex w-full max-w-sm rounded-md border border-border bg-background px-4 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring placeholder:text-muted-foreground"
+        className="flex w-full max-w-sm rounded-sm border border-[#E2E8ED] bg-white px-4 py-2.5 text-sm text-[#1F2B35] focus:outline-none focus:border-[#0081F6] focus:ring-2 focus:ring-[#0081F6]/20 placeholder:text-[#6F8394]"
       />
 
       {filtered && filtered.length === 0 ? (
-        <div className="rounded-lg border border-border bg-card p-10 text-center">
-          <SearchX className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-          <p className="text-muted-foreground text-sm">
+        <div className="rounded-sm bg-white card-shadow p-10 text-center">
+          <SearchX className="h-10 w-10 text-[#6F8394] mx-auto mb-3" />
+          <p className="text-[#6F8394] text-sm">
             No pages match &ldquo;{search}&rdquo;
           </p>
         </div>

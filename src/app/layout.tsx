@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Mukta, Hind_Vadodara } from "next/font/google";
 import "./globals.css";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import ReactQueryProvider from "@/components/rect-query-provider";
@@ -8,9 +8,17 @@ import { SonnerToaster } from "@/components/sonner-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
-const inter = Inter({
+const hindVadodara = Hind_Vadodara({
     subsets: ["latin"],
+    weight: ["400", "700"],
     variable: "--font-sans",
+    display: "swap",
+});
+
+const mukta = Mukta({
+    subsets: ["latin"],
+    weight: ["500", "700"],
+    variable: "--font-heading",
     display: "swap",
 });
 
@@ -22,11 +30,6 @@ export const metadata: Metadata = {
     description:
         "Transform raw product information into compelling, conversion-optimized sales pages instantly with AI.",
     keywords: ["AI", "sales page", "copywriting", "marketing", "landing page generator"],
-    openGraph: {
-        title: "SalesCraft — AI Sales Page Generator",
-        description: "Transform product info into persuasive sales pages with AI.",
-        type: "website",
-    },
 };
 
 export default function RootLayout({
@@ -35,11 +38,15 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={cn("font-sans", inter.variable)} suppressHydrationWarning>
-            <body className={inter.className}>
+        <html
+            lang="en"
+            className={cn(hindVadodara.variable, mukta.variable)}
+            suppressHydrationWarning
+        >
+            <body className={cn(hindVadodara.className, "antialiased")}>
                 <ThemeProvider
                     attribute="class"
-                    defaultTheme="dark"
+                    defaultTheme="light"
                     enableSystem
                     disableTransitionOnChange
                 >
