@@ -138,6 +138,43 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
+## Production Deployment (Vercel + Hosted Postgres)
+
+This project is designed to be deployed as a live system with a real database (e.g. for an assessment submission).
+
+### 1. Create a hosted PostgreSQL database
+
+Use any managed Postgres provider (Neon, Supabase, Railway, etc.) and copy the connection string.
+
+### 2. Push Drizzle schema to the production database
+
+Run locally (or in CI) with `DATABASE_URL` pointing to production:
+
+```bash
+export DATABASE_URL="postgresql://..."
+bun run db:push
+```
+
+### 3. Deploy on Vercel
+
+- Import the GitHub repo into Vercel
+- Set **Environment Variables** (Production):
+  - `DATABASE_URL` = production Postgres connection string
+  - `BETTER_AUTH_SECRET` = random secret (32+ chars)
+  - `BETTER_AUTH_URL` = `https://<your-vercel-domain>`
+  - `NEXT_PUBLIC_BASE_URL` = `https://<your-vercel-domain>`
+  - `OPENAI_API_KEY` = your OpenAI API key
+- Deploy
+
+### 4. Post-deploy verification (required)
+
+- Register a new user (production)
+- Create a new sales page (AI generation)
+- Refresh the page and confirm the sales page still exists (DB persistence)
+- Try delete and confirm it is removed
+
+---
+
 ## API Routes (Elysia)
 
 All routes are mounted under `/api` via `src/app/api/[[...slugs]]/route.ts`.
@@ -187,6 +224,24 @@ bun run format     # Format with Biome
 bun run db:push    # Push schema to database
 bun run db:studio  # Open Drizzle Studio (DB browser)
 ```
+
+---
+
+## Submission Checklist (Assessment)
+
+- **Live URL**: Deployed web app link (not localhost)
+- **Database connected**: Sales pages are created and persisted in PostgreSQL (`sales_pages` table)
+- **Docs**: This README (architecture + setup + deployment)
+- **Video**: Short walkthrough (public/unlisted YouTube link)
+
+---
+
+## Security Notes
+
+- Never commit `.env` (already ignored via `.gitignore`)
+- Rotate any secrets if they were ever exposed:
+  - `OPENAI_API_KEY`
+  - `BETTER_AUTH_SECRET`
 
 ---
 

@@ -1,19 +1,4 @@
 services:
-  postgres:
-    image: postgres:16-alpine
-    container_name: salescraft-db
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: salescraft
-      POSTGRES_PASSWORD: salescraft
-      POSTGRES_DB: salescraft
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
-    networks:
-      - shared_net
-
   app:
     build:
       context: .
@@ -23,16 +8,10 @@ services:
     container_name: salescraft
     restart: unless-stopped
     ports:
-      - '3000:3000'
+      - "3004:3004"
     env_file: .env
-    depends_on:
-      postgres:
-        condition: service_started
     networks:
       - shared_net
-
-volumes:
-  postgres_data:
 
 networks:
   shared_net:

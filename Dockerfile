@@ -1,12 +1,12 @@
 FROM oven/bun:1-alpine AS base
 WORKDIR /app
 
-# ── deps ─────────────────────────────────────────────────────────────────────
+# deps
 FROM base AS deps
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 
-# ── builder ───────────────────────────────────────────────────────────────────
+# builder
 FROM base AS builder
 WORKDIR /app
 
@@ -16,10 +16,9 @@ ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 COPY .env .env
-
 RUN bun run build
 
-# ── runner ────────────────────────────────────────────────────────────────────
+# runner
 FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
@@ -28,8 +27,8 @@ COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
 
-EXPOSE 3000
-ENV PORT=3000
+EXPOSE 3004
+ENV PORT=3004
 ENV HOSTNAME=0.0.0.0
 
 CMD ["node", "server.js"]
